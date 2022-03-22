@@ -2408,6 +2408,15 @@ func (portal *Portal) preprocessMatrixMedia(sender *User, relaybotFormatted bool
 			return nil
 		}
 	}
+	if mediaType == whatsmeow.MediaVideo && content.GetInfo().MimeType == "video/webm" {
+		data, err = ffmpeg.ConvertBytes(data, ".mp4", []string{"-f", "webm"}, []string{},
+			"webm")
+		if err != nil {
+			portal.log.Errorfln("Failed to convert webm to mp4 in %s: %v", eventID, err)
+			return nil
+		}
+		content.Info.MimeType = "video/mp4"
+	}
 	if mediaType == whatsmeow.MediaVideo && content.GetInfo().MimeType == "image/gif" {
 		data, err = ffmpeg.ConvertBytes(data, ".mp4", []string{"-f", "gif"}, []string{
 			"-pix_fmt", "yuv420p", "-c:v", "libx264", "-movflags", "+faststart",
